@@ -43,11 +43,9 @@ public class Lote {
     private List<String> certificaciones;
 
     @OneToMany(mappedBy = "lote")
-    @JsonManagedReference
     private List<Calificacion> calificaciones;
 
     @ManyToOne
-    @JsonBackReference
     private Agricultor agricultor;
 
     private Double promedioCalificaciones;

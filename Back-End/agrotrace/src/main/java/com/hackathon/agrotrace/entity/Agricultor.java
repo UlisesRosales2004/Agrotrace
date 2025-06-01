@@ -34,7 +34,6 @@ public class Agricultor {
     private LocalDate fechaRegistro;
 
     @OneToMany(mappedBy = "agricultor")
-    @JsonManagedReference
     private List<Lote> lotes;
 
     private Double calificacionPromedio;

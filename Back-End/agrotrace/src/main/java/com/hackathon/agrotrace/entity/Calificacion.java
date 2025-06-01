@@ -30,6 +30,5 @@ public class Calificacion {
     private int cantidadEstrellas;
 
     @ManyToOne
-    @JsonBackReference
     private Lote lote;
 }
