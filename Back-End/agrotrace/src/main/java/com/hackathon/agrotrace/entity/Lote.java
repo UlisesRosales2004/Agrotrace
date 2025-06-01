@@ -1,5 +1,7 @@
 package com.hackathon.agrotrace.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,13 +31,17 @@ public class Lote {
     private String qrImageUrl;
     private LocalDate fechaCarga;
     private LocalDate fechaExpiracion;
+    private String price;
+    private String priceUnit;
     @ElementCollection
     private List<String> certificaciones;
 
     @OneToMany(mappedBy = "lote")
+    @JsonManagedReference
     private List<Calificacion> calificaciones;
 
     @ManyToOne
+    @JsonBackReference
     private Agricultor agricultor;
 
     private Double promedioCalificaciones;

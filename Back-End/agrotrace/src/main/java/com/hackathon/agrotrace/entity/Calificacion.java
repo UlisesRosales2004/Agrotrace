@@ -1,5 +1,6 @@
 package com.hackathon.agrotrace.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -23,5 +24,6 @@ public class Calificacion {
     private int cantidadEstrellas;
 
     @ManyToOne
+    @JsonBackReference
     private Lote lote;
 }

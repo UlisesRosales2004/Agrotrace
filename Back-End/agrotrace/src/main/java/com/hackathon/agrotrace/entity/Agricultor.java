@@ -1,5 +1,6 @@
 package com.hackathon.agrotrace.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class Agricultor {
     private LocalDate fechaRegistro;
 
     @OneToMany(mappedBy = "agricultor")
+    @JsonManagedReference
     private List<Lote> lotes;
 
     private Double calificacionPromedio;
