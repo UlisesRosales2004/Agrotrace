@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/lotes")
-@CrossOrigin(origins = "*")
 public class LoteController {
 
     @Autowired
