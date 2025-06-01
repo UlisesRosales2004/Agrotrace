@@ -1,4 +1,5 @@
 🌱 AgroTrace
+
 AgroTrace es una aplicación basada en blockchain que permite a los usuarios acceder de forma transparente y segura a la información detallada de los lotes de verduras ofrecidos por los agricultores. Nuestro objetivo es fomentar la trazabilidad y la confianza en los productos agrícolas mediante el uso de tecnologías descentralizadas.
 
 🚜 ¿Qué hace AgroTrace?
@@ -32,6 +33,7 @@ Aumentar la confianza entre productores y consumidores.
 Facilitar auditorías y certificaciones.
 
 🚀 Tecnologías utilizadas
+
 Smart Contracts (Solidity)
 
 JavaScripy
