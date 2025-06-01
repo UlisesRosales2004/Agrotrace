@@ -1,7 +1,13 @@
 import { Eye, MapPin, Package } from "lucide-react";
 import StarRating from "./StarRating";
+import type { Farmer } from "../types/farmer";
 
-const FarmerCard = ({ farmer, onViewProfile }) => {
+interface FarmerCardProps {
+    farmer: Farmer;
+    onViewProfile: (farmer: Farmer) => void;
+}
+
+const FarmerCard: React.FC<FarmerCardProps> = ({ farmer, onViewProfile }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
             <div className="flex items-center mb-4">

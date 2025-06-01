@@ -1,10 +1,18 @@
 import { Package, Plus, Upload } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { Product } from "../types/product";
+import { getFarmerProducts, uploadProduct } from "../services/productService";
+import { useUser } from "../context/UserContext";
 
-const PrivateDashboard = ({ farmer, onLogout }) => {
+interface PrivateDashboardProps {
+    onLogout: () => void;
+}
+
+const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
+    const { user: farmer } = useUser(); 
     const [showUploadForm, setShowUploadForm] = useState(false);
-    const [products, setProducts] = useState(farmer.products || []);
+    const [products, setProducts] = useState<Product[]>([]);
     const [newProduct, setNewProduct] = useState({
         name: "",
         type: "",
@@ -13,32 +21,51 @@ const PrivateDashboard = ({ farmer, onLogout }) => {
         practices: "",
     });
 
-    const handleUploadSubmit = async (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        const fetchProducts = async () => {
+            if (!farmer) return;
 
-        // Simular envío al backend y respuesta con URL firmada
-        const signedUrl = `https://blockchain.agri/verify/${Math.random().toString(36).substr(2, 9)}`;
-
-        const product = {
-            id: Date.now(),
-            name: newProduct.name,
-            harvestDate: new Date().toISOString().split("T")[0],
-            certifications: newProduct.practices.split(",").map((p) => p.trim()),
-            rating: 0,
-            signedUrl,
+            try {
+                const fetched = await getFarmerProducts(farmer.id);
+                setProducts(fetched);
+            } catch (error) {
+                console.error("Error al obtener productos:", error);
+            }
         };
 
-        setProducts([...products, product]);
-        setNewProduct({ name: "", type: "", description: "", plantingDate: "", practices: "" });
-        setShowUploadForm(false);
+        fetchProducts();
+    }, [farmer]);
+
+    const handleUploadSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!farmer) return;
+
+        const payload = {
+            name: newProduct.name,
+            type: newProduct.type,
+            description: newProduct.description,
+            plantingDate: newProduct.plantingDate,
+            certifications: newProduct.practices.split(",").map((p) => p.trim()),
+        };
+
+        try {
+            const createdProduct = await uploadProduct(farmer.id, payload);
+            setProducts((prev) => [...prev, createdProduct]);
+            setNewProduct({ name: "", type: "", description: "", plantingDate: "", practices: "" });
+            setShowUploadForm(false);
+        } catch (err) {
+            console.error("Error al subir producto:", err);
+        }
     };
 
-    const handleInputChange = (e) => {
-        setNewProduct({
-            ...newProduct,
-            [e.target.name]: e.target.value,
-        });
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
     };
+
+    // Si no hay farmer logueado, mostrar loading o redirect
+    if (!farmer) {
+        return <div>Cargando...</div>;
+    }
 
     return (
         <div className="min-h-screen bg-gray-50">

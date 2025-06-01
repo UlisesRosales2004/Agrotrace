@@ -1,14 +1,30 @@
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { login as loginRequest } from "../services/authService";
+import { useUser } from "../context/UserContext";
 
-const LoginView = ({ onBack, onRegister, onLoginSuccess }) => {
+interface LoginViewProps {
+    onBack: () => void;
+    onRegister: () => void;
+    onLoginSuccess: () => void; // Ya no necesita el user como parámetro
+}
+
+const LoginView: React.FC<LoginViewProps> = ({ onBack, onRegister, onLoginSuccess }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { login } = useUser();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simular login exitoso
-        onLoginSuccess({ name: "María González", email });
+
+        try {
+            const { user } = await loginRequest(email, password);
+            login(user); // Guarda el user en el context
+            onLoginSuccess(); // Solo notifica que el login fue exitoso
+        } catch (err) {
+            console.error("Error de login", err);
+            alert("Credenciales incorrectas");
+        }
     };
 
     return (

@@ -1,8 +1,35 @@
+import { useEffect, useState } from "react";
 import { ArrowLeft, MapPin, Package } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import StarRating from "../components/StarRating";
+import type { Farmer } from "../types/farmer";
+import type { Product } from "../types/product";
+import { getProductsByFarmerId } from "../services/farmerService";
 
-const PublicProfile = ({ farmer, onBack }) => {
+interface PublicProfileProps {
+    farmer: Farmer;
+    onBack: () => void;
+}
+
+const PublicProfile: React.FC<PublicProfileProps> = ({ farmer, onBack }) => {
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const data = await getProductsByFarmerId(farmer.id);
+                setProducts(data);
+            } catch (error) {
+                console.error("Error fetching products:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [farmer.id]);
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -44,9 +71,11 @@ const PublicProfile = ({ farmer, onBack }) => {
                 {/* Products */}
                 <div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-6">Productos</h3>
-                    {farmer.products.length > 0 ? (
+                    {loading ? (
+                        <p className="text-gray-500">Cargando productos...</p>
+                    ) : products.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {farmer.products.map((product) => (
+                            {products.map((product) => (
                                 <ProductCard key={product.id} product={product} showQR={true} />
                             ))}
                         </div>

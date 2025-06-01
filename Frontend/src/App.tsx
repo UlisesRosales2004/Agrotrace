@@ -1,16 +1,20 @@
 import { useState } from "react";
 import PublicLanding from "./Pages/PublicLanding";
-import LoginView from "./Pages/LoginViex";
+import LoginView from "./Pages/LoginView";
 import RegisterView from "./Pages/RegisterView";
 import PublicProfile from "./Pages/PublicProfile";
 import PrivateDashboard from "./Pages/PrivateDashboard";
+import { UserProvider } from "./context/UserContext";
+import type { Farmer } from "./types/farmer";
+
+type ViewType = "landing" | "login" | "register" | "profile" | "dashboard";
 
 export default function App() {
-    const [currentView, setCurrentView] = useState("landing");
-    const [selectedFarmer, setSelectedFarmer] = useState(null);
-    const [loggedInFarmer, setLoggedInFarmer] = useState(null);
+    const [currentView, setCurrentView] = useState<ViewType>("landing");
+    const [selectedFarmer, setSelectedFarmer] = useState<Farmer | null>(null);
+    const [currentUser, setCurrentUser] = useState<Farmer | null>(null);
 
-    const handleViewProfile = (farmer) => {
+    const handleViewProfile = (farmer: Farmer) => {
         setSelectedFarmer(farmer);
         setCurrentView("profile");
     };
@@ -23,18 +27,24 @@ export default function App() {
         setCurrentView("register");
     };
 
-    const handleLoginSuccess = (farmer) => {
-        setLoggedInFarmer(farmer);
+    const handleLoginSuccess = () => {
         setCurrentView("dashboard");
     };
 
-    const handleRegisterSuccess = (farmerData) => {
-        setLoggedInFarmer(farmerData);
+    const handleRegisterSuccess = (user: Farmer) => {
+        // Convertir User a Farmer si es necesario
+        const farmer: Farmer = {
+            ...user,
+            location: user.location || "",
+            rating: user.rating || 0,
+            productsCount: user.productsCount || 0,
+        };
+        setCurrentUser(farmer);
         setCurrentView("dashboard");
     };
 
     const handleLogout = () => {
-        setLoggedInFarmer(null);
+        setCurrentUser(null);
         setCurrentView("landing");
     };
 
@@ -44,24 +54,24 @@ export default function App() {
     };
 
     return (
-        <div className="App">
-            {currentView === "landing" && <PublicLanding onLogin={handleLogin} onViewProfile={handleViewProfile} />}
+        <UserProvider user={currentUser}>
+            <div className="App">
+                {currentView === "landing" && <PublicLanding onLogin={handleLogin} onViewProfile={handleViewProfile} />}
 
-            {currentView === "login" && (
-                <LoginView onBack={handleBack} onRegister={handleRegister} onLoginSuccess={handleLoginSuccess} />
-            )}
+                {currentView === "login" && (
+                    <LoginView onBack={handleBack} onRegister={handleRegister} onLoginSuccess={handleLoginSuccess} />
+                )}
 
-            {currentView === "register" && (
-                <RegisterView onBack={handleBack} onRegisterSuccess={handleRegisterSuccess} />
-            )}
+                {currentView === "register" && (
+                    <RegisterView onBack={handleBack} onRegisterSuccess={handleRegisterSuccess} />
+                )}
 
-            {currentView === "profile" && selectedFarmer && (
-                <PublicProfile farmer={selectedFarmer} onBack={handleBack} />
-            )}
+                {currentView === "profile" && selectedFarmer && (
+                    <PublicProfile farmer={selectedFarmer} onBack={handleBack} />
+                )}
 
-            {currentView === "dashboard" && loggedInFarmer && (
-                <PrivateDashboard farmer={loggedInFarmer} onLogout={handleLogout} />
-            )}
-        </div>
+                {currentView === "dashboard" && <PrivateDashboard onLogout={handleLogout} />}
+            </div>
+        </UserProvider>
     );
 }
