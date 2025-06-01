@@ -57,7 +57,7 @@ public class Lote {
         // Redondeo a múltiplos de 0.5
         return Math.round(promedio * 2) / 2.0;
     }
-
+    //esto lo debo usar cada vez que se cree una calificación para actualizarla en el lote osea lo debo poner en el service
     public void agregarCalificacion(Calificacion calificacion) {
         if (this.calificaciones == null) {
             this.calificaciones = new java.util.ArrayList<>();
