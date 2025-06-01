@@ -1,7 +1,9 @@
 package com.hackathon.agrotrace.service;
 
+import com.hackathon.agrotrace.entity.Agricultor;
 import com.hackathon.agrotrace.entity.Calificacion;
 import com.hackathon.agrotrace.entity.Lote;
+import com.hackathon.agrotrace.repository.IAgricultorRepository;
 import com.hackathon.agrotrace.repository.ICalificacionRepository;
 import com.hackathon.agrotrace.repository.ILoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ public class CalificacionService implements ICalificacionService {
 
     @Autowired
     private ILoteRepository loteRepo;
+    @Autowired
+    private IAgricultorRepository agricultorRepo;
 
     @Override
     public List<Calificacion> getAllCalificaciones() {
@@ -31,28 +35,38 @@ public class CalificacionService implements ICalificacionService {
 
     @Override
     public Calificacion saveCalificacion(Calificacion nuevaCalificacion) {
-        // Obtener el lote al que se va a asociar esta calificación
         Lote lote = nuevaCalificacion.getLote();
 
         if (lote != null && lote.getId_lote() != null) {
             Optional<Lote> optionalLote = loteRepo.findById(lote.getId_lote());
+
             if (optionalLote.isPresent()) {
                 Lote loteExistente = optionalLote.get();
 
-                // Usar el método personalizado para agregar la calificación
+                // Asociar calificación al lote
                 loteExistente.agregarCalificacion(nuevaCalificacion);
 
-                // Guardar primero la calificación, luego el lote (si necesario)
+                // Guardar calificación
                 Calificacion guardada = calificacionRepository.save(nuevaCalificacion);
-                loteRepo.save(loteExistente); // actualizar promedio
+
+                // Actualizar promedio del lote si lo hacés manualmente
+                loteRepo.save(loteExistente);
+
+                // Recalcular y guardar el agricultor
+                Agricultor agricultor = loteExistente.getAgricultor();
+                if (agricultor != null) {
+                    agricultor.setCalificacionPromedio(agricultor.calcularCalificacionPromedio());
+                    agricultorRepo.save(agricultor); // Asegurate de tener el repo
+                }
 
                 return guardada;
             }
         }
 
-        // Si no hay lote válido, simplemente guardar la calificación (o lanzar excepción)
+        // Si no hay lote válido, simplemente guardar la calificación
         return calificacionRepository.save(nuevaCalificacion);
     }
+
 
 
     @Override
