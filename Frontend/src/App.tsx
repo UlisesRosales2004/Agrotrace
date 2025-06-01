@@ -1,35 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import PublicLanding from "./Pages/PublicLanding";
+import LoginView from "./Pages/LoginViex";
+import RegisterView from "./Pages/RegisterView";
+import PublicProfile from "./Pages/PublicProfile";
+import PrivateDashboard from "./Pages/PrivateDashboard";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+    const [currentView, setCurrentView] = useState("landing");
+    const [selectedFarmer, setSelectedFarmer] = useState(null);
+    const [loggedInFarmer, setLoggedInFarmer] = useState(null);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleViewProfile = (farmer) => {
+        setSelectedFarmer(farmer);
+        setCurrentView("profile");
+    };
+
+    const handleLogin = () => {
+        setCurrentView("login");
+    };
+
+    const handleRegister = () => {
+        setCurrentView("register");
+    };
+
+    const handleLoginSuccess = (farmer) => {
+        setLoggedInFarmer(farmer);
+        setCurrentView("dashboard");
+    };
+
+    const handleRegisterSuccess = (farmerData) => {
+        setLoggedInFarmer(farmerData);
+        setCurrentView("dashboard");
+    };
+
+    const handleLogout = () => {
+        setLoggedInFarmer(null);
+        setCurrentView("landing");
+    };
+
+    const handleBack = () => {
+        setCurrentView("landing");
+        setSelectedFarmer(null);
+    };
+
+    return (
+        <div className="App">
+            {currentView === "landing" && <PublicLanding onLogin={handleLogin} onViewProfile={handleViewProfile} />}
+
+            {currentView === "login" && (
+                <LoginView onBack={handleBack} onRegister={handleRegister} onLoginSuccess={handleLoginSuccess} />
+            )}
+
+            {currentView === "register" && (
+                <RegisterView onBack={handleBack} onRegisterSuccess={handleRegisterSuccess} />
+            )}
+
+            {currentView === "profile" && selectedFarmer && (
+                <PublicProfile farmer={selectedFarmer} onBack={handleBack} />
+            )}
+
+            {currentView === "dashboard" && loggedInFarmer && (
+                <PrivateDashboard farmer={loggedInFarmer} onLogout={handleLogout} />
+            )}
+        </div>
+    );
 }
-
-export default App
