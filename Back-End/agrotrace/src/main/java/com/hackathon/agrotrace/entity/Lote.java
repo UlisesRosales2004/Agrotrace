@@ -1,5 +1,9 @@
 package com.hackathon.agrotrace.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +13,10 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id_lote"
+)
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,6 +37,8 @@ public class Lote {
     private String qrImageUrl;
     private LocalDate fechaCarga;
     private LocalDate fechaExpiracion;
+    private String price;
+    private String priceUnit;
     @ElementCollection
     private List<String> certificaciones;
 
@@ -57,7 +67,7 @@ public class Lote {
         // Redondeo a múltiplos de 0.5
         return Math.round(promedio * 2) / 2.0;
     }
-
+    //esto lo debo usar cada vez que se cree una calificación para actualizarla en el lote osea lo debo poner en el service
     public void agregarCalificacion(Calificacion calificacion) {
         if (this.calificaciones == null) {
             this.calificaciones = new java.util.ArrayList<>();
