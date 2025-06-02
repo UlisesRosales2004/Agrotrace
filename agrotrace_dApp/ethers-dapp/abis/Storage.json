@@ -1,0 +1,311 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id_lote",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_nombre",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_tipoCultivo",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_descripcion",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_fechaSiembra",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_fechaCosecha",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_practicasUtilizadas",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_fechaExpiracion",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_id_agricultor",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_nombre_agricultor",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "getAgricultorId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAgricultorNombre",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDescripcion",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFechaCosecha",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFechaExpiracion",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFechaSiembra",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getIdLote",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getLote",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id_lote",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "nombre",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "tipoCultivo",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "descripcion",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fechaSiembra",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fechaCosecha",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "practicasUtilizadas",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fechaExpiracion",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id_agricultor",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "nombre_agricultor",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNombreLote",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getPracticasUtilizadas",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTipoCultivo",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lote",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id_lote",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "nombre",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "tipoCultivo",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "descripcion",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fechaSiembra",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fechaCosecha",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "practicasUtilizadas",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fechaExpiracion",
+        "type": "string"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id_agricultor",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "nombre",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct Agrotrace.AgricultorInfo",
+        "name": "agricultor",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
