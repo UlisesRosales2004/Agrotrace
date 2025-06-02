@@ -1,18 +1,42 @@
+import type { Rating } from "./rating";
+
 export interface Product {
-    id: string;
-    name: string;
-    harvestDate: string;
-    certifications: string[];
-    rating: number;
-    signedUrl: string;
-    price: string;
-    priceUnit: string;
+    id_lote: number;
+    nombre: string;
+    tipoCultivo: string;
+    descripcion: string;
+    fechaSiembre: string;
+    fechaCosecha: string;
+    practicasUtilizadas: string;
+    urlFirmado: string;
+    qrImageUrl?: string;
+    fechaCarga: string;
+    fechaExpiracion: string;
+    certificaciones: string[];
+    calificaciones?: Rating[];
+    agricultor: {
+        id_agrigultor: number;
+        nombre?: string;
+        ubicacion?: string;
+    };
+    promedioCalificaciones?: number;
+    price?: string;
+    priceUnit?: string;
 }
 
 export interface ProductUploadDTO {
-    name: string;
-    type: string;
-    description: string;
-    plantingDate: string;
-    certifications: string[];
+    nombre: string;
+    tipoCultivo: string;
+    descripcion: string;
+    fechaSiembre: string;
+    fechaCosecha?: string; 
+    practicasUtilizadas: string;
+    urlFirmado?: string;
+    qrImageUrl?: string;
+    fechaCarga?: string;
+    fechaExpiracion?: string;
+    certificaciones: string[];
+    agricultor: {
+        id_agrigultor: number;
+    };
 }

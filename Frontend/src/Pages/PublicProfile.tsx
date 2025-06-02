@@ -2,23 +2,23 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, MapPin, Package } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import StarRating from "../components/StarRating";
-import type { Farmer } from "../types/farmer";
 import type { Product } from "../types/product";
-import { getProductsByFarmerId } from "../services/farmerService";
+import type { Usuario } from "../types/user";
+import { getFarmerProducts } from "../services/productService";
 
 interface PublicProfileProps {
-    farmer: Farmer;
+    farmer: Usuario;
     onBack: () => void;
 }
 
 const PublicProfile: React.FC<PublicProfileProps> = ({ farmer, onBack }) => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-
+    const defaultAvatar = `https://cdn-icons-png.flaticon.com/512/149/149071.png`;
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const data = await getProductsByFarmerId(farmer.id);
+                const data = await getFarmerProducts(farmer.id_agrigultor);
                 setProducts(data);
             } catch (error) {
                 console.error("Error fetching products:", error);
@@ -28,7 +28,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ farmer, onBack }) => {
         };
 
         fetchProducts();
-    }, [farmer.id]);
+    }, [farmer.id_agrigultor]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -51,18 +51,18 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ farmer, onBack }) => {
                 <div className="bg-white rounded-lg shadow-md p-8 mb-8">
                     <div className="flex items-center mb-6">
                         <img
-                            src={farmer.image || "/placeholder.svg"}
-                            alt={farmer.name}
+                            src={farmer.fotoPerfilUrl || defaultAvatar}
+                            alt={farmer.nombre}
                             className="w-24 h-24 rounded-full object-cover mr-6"
                         />
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-900">{farmer.name}</h2>
+                            <h2 className="text-3xl font-bold text-gray-900">{farmer.nombre}</h2>
                             <div className="flex items-center text-gray-600 text-lg mt-2">
                                 <MapPin className="w-5 h-5 mr-2" />
-                                {farmer.location}
+                                {farmer.ubicacion}
                             </div>
                             <div className="mt-2">
-                                <StarRating rating={farmer.rating} size="w-5 h-5" />
+                                <StarRating rating={farmer.calificacionPromedio || 0} size="w-5 h-5" />
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ farmer, onBack }) => {
                     ) : products.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {products.map((product) => (
-                                <ProductCard key={product.id} product={product} showQR={true} />
+                                <ProductCard key={product.id_lote} product={product} showQR={true} />
                             ))}
                         </div>
                     ) : (

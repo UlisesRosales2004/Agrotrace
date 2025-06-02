@@ -2,28 +2,65 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { login as loginRequest } from "../services/authService";
 import { useUser } from "../context/UserContext";
+import type { Usuario } from "../types/user";
 
 interface LoginViewProps {
     onBack: () => void;
     onRegister: () => void;
-    onLoginSuccess: () => void; // Ya no necesita el user como parámetro
+    onLoginSuccess: (user: Usuario) => void;
 }
 
 const LoginView: React.FC<LoginViewProps> = ({ onBack, onRegister, onLoginSuccess }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const { login } = useUser();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        console.log("🔍 INICIO - Iniciando proceso de login");
+        console.log("📧 Email:", email);
+
+        setIsLoading(true);
+
         try {
-            const { user } = await loginRequest(email, password);
-            login(user); // Guarda el user en el context
-            onLoginSuccess(); // Solo notifica que el login fue exitoso
+            console.log("🌐 PASO 1 - Enviando request al servidor...");
+            const response = await loginRequest(email, password);
+            console.log("✅ PASO 2 - Respuesta del servidor:", response);
+
+            // El servidor devuelve el usuario directamente, no en { user: ... }
+            const user = response;
+            console.log("👤 PASO 3 - Usuario extraído:", user);
+            console.log("👤 PASO 3.1 - Tipo de usuario:", typeof user);
+            console.log("👤 PASO 3.2 - Usuario es undefined?", user === undefined);
+            console.log("👤 PASO 3.3 - Usuario es null?", user === null);
+
+            if (!user) {
+                console.error("❌ ERROR - Usuario es null o undefined");
+                alert("Error: No se recibió información del usuario");
+                setIsLoading(false);
+                return;
+            }
+
+            console.log("🔄 PASO 4 - Guardando en contexto...");
+            login(user);
+            console.log("✅ PASO 5 - Usuario guardado en contexto");
+
+            console.log("🚀 PASO 6 - Llamando onLoginSuccess...");
+            console.log("🚀 PASO 6.1 - Función onLoginSuccess existe?", typeof onLoginSuccess === 'function');
+
+            onLoginSuccess(user);
+            console.log("✅ PASO 7 - onLoginSuccess ejecutado");
+
         } catch (err) {
-            console.error("Error de login", err);
-            alert("Credenciales incorrectas");
+            console.error("💥 ERROR en login:", err);
+            console.error("💥 ERROR tipo:", typeof err);
+            console.error("💥 ERROR mensaje:", err instanceof Error ? err.message : 'Error desconocido');
+            alert("Credenciales incorrectas o error de conexión");
+        } finally {
+            console.log("🏁 FINAL - Desactivando loading");
+            setIsLoading(false);
         }
     };
 
@@ -53,6 +90,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onBack, onRegister, onLoginSucces
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                                 placeholder="tu@email.com"
+                                disabled={isLoading}
                             />
                         </div>
                         <div>
@@ -67,19 +105,21 @@ const LoginView: React.FC<LoginViewProps> = ({ onBack, onRegister, onLoginSucces
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                                 placeholder="••••••••"
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+                        disabled={isLoading}
+                        className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Ingresar
+                        {isLoading ? "Ingresando..." : "Ingresar"}
                     </button>
 
                     <div className="text-center">
-                        <button type="button" onClick={onRegister} className="text-green-600 hover:text-green-700">
+                        <button type="button" onClick={onRegister} disabled={isLoading} className="text-green-600 hover:text-green-700 disabled:opacity-50">
                             ¿No tenés cuenta? Crear agricultor
                         </button>
                     </div>

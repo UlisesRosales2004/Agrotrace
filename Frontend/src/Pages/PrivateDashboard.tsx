@@ -1,8 +1,10 @@
+
+
 import { Package, Plus, Upload } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { useEffect, useState } from "react";
-import type { Product } from "../types/product";
-import { getFarmerProducts, uploadProduct } from "../services/productService";
+import type { Product, ProductUploadDTO } from "../types/product";
+import { getFarmerProducts, createProduct } from "../services/productService";
 import { useUser } from "../context/UserContext";
 
 interface PrivateDashboardProps {
@@ -10,51 +12,89 @@ interface PrivateDashboardProps {
 }
 
 const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
-    const { user: farmer } = useUser(); 
+    const { user: farmer } = useUser();
     const [showUploadForm, setShowUploadForm] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true); // Agregar estado de loading
+    const [error, setError] = useState<string | null>(null); // Agregar estado de error
+
+    // Estado del formulario
     const [newProduct, setNewProduct] = useState({
         name: "",
         type: "",
         description: "",
         plantingDate: "",
-        practices: "",
+        harvestDate: "",
+        practices: ""
     });
 
     useEffect(() => {
         const fetchProducts = async () => {
-            if (!farmer) return;
+            if (!farmer?.id_agrigultor) {
+                setLoading(false);
+                return;
+            }
 
             try {
-                const fetched = await getFarmerProducts(farmer.id);
+                setLoading(true);
+                setError(null);
+
+                console.log('Fetching products for farmer:', farmer.id_agrigultor);
+                const fetched = await getFarmerProducts(farmer.id_agrigultor);
+
+                console.log('Productos obtenidos:', fetched);
                 setProducts(fetched);
+
             } catch (error) {
                 console.error("Error al obtener productos:", error);
+                setError("Error al cargar los productos. Por favor, intenta de nuevo.");
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchProducts();
-    }, [farmer]);
+    }, [farmer?.id_agrigultor]); // Más específico en la dependencia
 
     const handleUploadSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!farmer) return;
+        if (!farmer?.id_agrigultor) return;
 
-        const payload = {
-            name: newProduct.name,
-            type: newProduct.type,
-            description: newProduct.description,
-            plantingDate: newProduct.plantingDate,
-            certifications: newProduct.practices.split(",").map((p) => p.trim()),
-        };
+        const certifications = newProduct.practices
+            ? newProduct.practices.split(",").map((p) => p.trim()).filter(p => p.length > 0)
+            : [];
 
         try {
-            const createdProduct = await uploadProduct(farmer.id, payload);
+            const payload: ProductUploadDTO = {
+                nombre: newProduct.name,
+                tipoCultivo: newProduct.type,
+                descripcion: newProduct.description,
+                fechaSiembre: newProduct.plantingDate,
+                fechaCosecha: newProduct.harvestDate || "",
+                practicasUtilizadas: newProduct.practices || "",
+                certificaciones: certifications,
+                agricultor: {
+                    id_agrigultor: farmer.id_agrigultor
+                }
+            };
+
+            const createdProduct = await createProduct(payload);
             setProducts((prev) => [...prev, createdProduct]);
-            setNewProduct({ name: "", type: "", description: "", plantingDate: "", practices: "" });
+
+            // Reset form
+            setNewProduct({
+                name: "",
+                type: "",
+                description: "",
+                plantingDate: "",
+                harvestDate: "",
+                practices: ""
+            });
+
             setShowUploadForm(false);
         } catch (err) {
             console.error("Error al subir producto:", err);
+            setError("Error al subir el producto. Por favor, intenta de nuevo.");
         }
     };
 
@@ -62,9 +102,16 @@ const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
         setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
     };
 
-    // Si no hay farmer logueado, mostrar loading o redirect
+    // Si no hay farmer logueado, mostrar loading
     if (!farmer) {
-        return <div>Cargando...</div>;
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+                    <p>Cargando...</p>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -75,7 +122,9 @@ const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
                     <div className="flex justify-between items-center h-16">
                         <h1 className="text-2xl font-bold text-green-600">AgroTrace - Dashboard</h1>
                         <div className="flex items-center gap-4">
-                            <span className="text-gray-700">Hola, {farmer.name}</span>
+                            <span className="text-gray-700">
+                                Hola, {farmer.nombre} (ID: {farmer.id_agrigultor})
+                            </span>
                             <button onClick={onLogout} className="text-gray-600 hover:text-gray-800">
                                 Cerrar sesión
                             </button>
@@ -96,6 +145,19 @@ const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
                         Subir nuevo lote
                     </button>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                        {error}
+                        <button
+                            onClick={() => setError(null)}
+                            className="float-right text-red-700 hover:text-red-900"
+                        >
+                            ×
+                        </button>
+                    </div>
+                )}
 
                 {/* Upload Form Modal */}
                 {showUploadForm && (
@@ -153,6 +215,16 @@ const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
                                     />
                                 </div>
                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700">Fecha de cosecha</label>
+                                    <input
+                                        name="harvestDate"
+                                        type="date"
+                                        value={newProduct.harvestDate}
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                                    />
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700">
                                         Prácticas utilizadas
                                     </label>
@@ -187,24 +259,34 @@ const PrivateDashboard: React.FC<PrivateDashboardProps> = ({ onLogout }) => {
                     </div>
                 )}
 
-                {/* Products Grid */}
-                {products.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {products.map((product) => (
-                            <ProductCard key={product.id} product={product} showQR={true} />
-                        ))}
+                {/* Loading State */}
+                {loading ? (
+                    <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600">Cargando tus productos...</p>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 mb-4">Aún no has subido productos</p>
-                        <button
-                            onClick={() => setShowUploadForm(true)}
-                            className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
-                        >
-                            Subir tu primer lote
-                        </button>
-                    </div>
+                    /* Products Grid */
+                    products.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {products.map((product) => (
+                                <ProductCard key={product.id_lote} product={product} showQR={true} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <p className="text-gray-600 mb-4">
+                                Aún no has subido productos para tu cuenta (ID: {farmer.id_agrigultor})
+                            </p>
+                            <button
+                                onClick={() => setShowUploadForm(true)}
+                                className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
+                            >
+                                Subir tu primer lote
+                            </button>
+                        </div>
+                    )
                 )}
             </main>
         </div>

@@ -1,25 +1,28 @@
 import type { Product } from "./product";
 
-export interface User {
-    id: string;
-    name: string;
+export interface Usuario {
+    id_agrigultor: number;
+    nombre: string;
     email: string;
-    location: string;
-    image?: string;
-    rating: number;
-    productsCount: number;
-    products?: Product[];
+    ubicacion: string;
+    fotoPerfilUrl?: string;
+    fechaRegistro: string;
+    calificacionPromedio?: number;
+    lotes?: Product[];
+    productsCount?: number;
+    contrasenia: string
 }
 
 export interface RegisterPayload {
-    name: string;
+    nombre: string;
     email: string;
-    password: string;
-    location: string;
-    profileImage?: string;
+    contrasenia: string;
+    ubicacion: string;
+    fotoPerfilUrl?: string;
+    fechaRegistro?: string;
 }
 
 export interface UserActivation {
-    id: string;
+    id_agrigultor: number;
     activated: boolean;
 }
